@@ -9,7 +9,7 @@ import java.util.logging.Logger;
  */
 
 public class Gare extends LinkedBlockingQueue<Caisse>{
-
+		
     public Gare(int n) {
         super(n);
         for(int i=0; i < n; i++){
@@ -21,5 +21,5 @@ public class Gare extends LinkedBlockingQueue<Caisse>{
             }
         }
     }
-    
+
 }

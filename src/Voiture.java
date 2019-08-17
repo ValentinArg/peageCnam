@@ -1,4 +1,6 @@
 
+import java.security.Timestamp;
+import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Condition;
@@ -50,6 +52,7 @@ public class Voiture extends Thread {
     private void entrer() {
         Random r = new Random();
         parcours = km_min + r.nextInt(km_max - km_min);//générer aléatoirement la longueur du parcours de cette voiture
+        //System.out.println("Parcours : "+parcours);
 
     }
 
@@ -67,11 +70,35 @@ public class Voiture extends Thread {
     private void sortir() {
         try {
             obs.increment(); //signaler à l'observateur qu'on attend une caisse
+            
+            String affichageCaisse = "";
+            System.out.println("Voiture " + num + " attend une caisse");
+            
+            Date date_avant = new Date();       
             Caisse c = gare.take();//demander une caisse, dès qu'une caisse est libre elle sera affecter à cette voiture et elle sortira du pool de caisses libres
-            c.payer();//payer
-            System.out.println("Voiture " + num + " : sortie");
-            gare.put(c);//libérer la caisse en la remettant dans le pool de caisses libres
             obs.decrement();//signaler à l'observateur qu'on est sorti de la file d'attente d'une caisse
+            
+            System.out.println("Voiture " + num + " rentre dans la caisse : "+c.toString());
+            Autoroute.setNb_voitures(Autoroute.getNb_voitures() + 1);
+            Date date_apres = new Date();
+            c.increment_Nb_voitures();
+            
+            long duree_attente = date_apres.getTime() - date_avant.getTime();
+            
+            Autoroute.increment_attente_total(duree_attente);
+            
+            
+            affichageCaisse = c.toString()+"\n"+ " Voiture "+num +"\n"+" Nb voitures :"+c.getNb_voitures()+"\n"+"Dur�e moyenne paiement : "+(float)c.getDuree_totale_paiement()/(float)c.getNb_voitures();
+            Autoroute.getArray_caisses().get(c.toString()).setText(affichageCaisse);
+            
+            int duree_paiement = c.payer();//payer
+            c.increment_Duree_totale_paiement(duree_paiement);
+            
+            System.out.println("Voiture " + num + " dur�e paiement : " + duree_paiement);
+            gare.put(c);//libérer la caisse en la remettant dans le pool de caisses libres
+            affichageCaisse = c.toString()+ "\n"+"LIBRE"+"\n"+ "Nb voitures :"+c.getNb_voitures()+"\n"+"Dur�e moyenne paiement : "+(float)c.getDuree_totale_paiement()/(float)c.getNb_voitures();
+            Autoroute.getArray_caisses().get(c.toString()).setText(affichageCaisse);
+            
         } catch (InterruptedException ex) {
         }
     }
