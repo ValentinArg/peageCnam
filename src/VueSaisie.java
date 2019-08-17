@@ -10,9 +10,9 @@ public class VueSaisie {
 
     public FormAutoroute lire() {
         System.out.print("Nombre de voitures : ");
-        int nb_v = 20;
+        int nb_v = 5;
         System.out.print("Nombre de caisses : ");
-        int nb_c = 4;
+        int nb_c = 5;
         System.out.print("Kilométrage min : ");
         int min = 40;
         System.out.print("Kilométrage max : ");

@@ -74,29 +74,29 @@ public class Voiture extends Thread {
             String affichageCaisse = "";
             System.out.println("Voiture " + num + " attend une caisse");
             
+            //La voiture demande une caisse
             Date date_avant = new Date();       
             Caisse c = gare.take();//demander une caisse, dÃ¨s qu'une caisse est libre elle sera affecter Ã  cette voiture et elle sortira du pool de caisses libres
+            Date date_apres = new Date();
+            Thread.sleep(1);//On attend 1ms pour éviter que laisser le temps à l'affichage de se mettre à jour
             obs.decrement();//signaler Ã  l'observateur qu'on est sorti de la file d'attente d'une caisse
-            
             System.out.println("Voiture " + num + " rentre dans la caisse : "+c.toString());
             Autoroute.setNb_voitures(Autoroute.getNb_voitures() + 1);
-            Date date_apres = new Date();
             c.increment_Nb_voitures();
             
-            long duree_attente = date_apres.getTime() - date_avant.getTime();
-            
-            Autoroute.increment_attente_total(duree_attente);
-            
-            
-            affichageCaisse = c.toString()+"\n"+ " Voiture "+num +"\n"+" Nb voitures :"+c.getNb_voitures()+"\n"+"Durée moyenne paiement : "+(float)c.getDuree_totale_paiement()/(float)c.getNb_voitures();
+            long duree_attente = date_apres.getTime() - date_avant.getTime(); 
+            Autoroute.maj_attente_moy(duree_attente);           
+            affichageCaisse = c.toString()+"\n"+ " Voiture "+num +"\n"+" Nb voitures :"+c.getNb_voitures()+"\n"+"Durée moyenne paiement : "+Math.round(c.getDuree_totale_paiement()/c.getNb_voitures())+"ms";
             Autoroute.getArray_caisses().get(c.toString()).setText(affichageCaisse);
             
+            //la voiture paye et on met à jour la moyenne de durée de paiement
             int duree_paiement = c.payer();//payer
             c.increment_Duree_totale_paiement(duree_paiement);
-            
             System.out.println("Voiture " + num + " durée paiement : " + duree_paiement);
+            
+            //La voiture a terminé et laisse donc la place
             gare.put(c);//libÃ©rer la caisse en la remettant dans le pool de caisses libres
-            affichageCaisse = c.toString()+ "\n"+"LIBRE"+"\n"+ "Nb voitures :"+c.getNb_voitures()+"\n"+"Durée moyenne paiement : "+(float)c.getDuree_totale_paiement()/(float)c.getNb_voitures();
+            affichageCaisse = c.toString()+ "\n"+"LIBRE"+"\n"+ "Nb voitures :"+c.getNb_voitures()+"\n"+"Durée moyenne paiement : "+Math.round(c.getDuree_totale_paiement()/c.getNb_voitures())+"ms";
             Autoroute.getArray_caisses().get(c.toString()).setText(affichageCaisse);
             
         } catch (InterruptedException ex) {

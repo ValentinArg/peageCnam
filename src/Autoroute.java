@@ -1,5 +1,4 @@
 
-import java.awt.*;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Timer;
@@ -16,11 +15,10 @@ public class Autoroute {
     private static Autoroute route = null;
     private static HashSet<Voiture> voitures = new HashSet<Voiture>();
     
-    private JFrame fenetre;
+    private static VuePeage vuepeage;
     private static Hashtable<String, JTextArea> array_caisses = new Hashtable<String, JTextArea>();
-    private static JLabel label_attente;
-    private static long attente_total;
-    
+    private static JLabel label_attente = new JLabel("");
+    private static long attente_total = 0; 
     private static int nb_voitures = 0;
 
     private Autoroute() {
@@ -45,31 +43,10 @@ public class Autoroute {
         Gare gare = new Gare(f.getNb_caisses());
         
         //Création de la fenêtre
-        fenetre = new JFrame("Simulateur");
-        Container contenu = fenetre.getContentPane();
-        contenu.setLayout(new BorderLayout());
-        
-        JPanel afficheur = new JPanel(new GridLayout(2, 1));
-        contenu.add(afficheur, BorderLayout.SOUTH);
-        
-        JLabel file = new JLabel();
-        afficheur.add(file);
-        
-        Autoroute.label_attente = new JLabel();
-        afficheur.add(Autoroute.label_attente);
-        
-        JPanel caisses = new JPanel(new GridLayout(1, f.getNb_caisses()));
-        contenu.add(caisses, BorderLayout.CENTER);
+        Autoroute.vuepeage = new VuePeage(gare, Autoroute.label_attente);     
                 
         //Ajout de l'état de la file dans la fenetre
-        System.out.println(gare.toString());
-        for(int i = 0; i < gare.toArray().length; i++) {
-        	JTextArea caisse = new JTextArea(""+gare.toArray()[i].toString());
-        	caisse.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        	Autoroute.getArray_caisses().put(gare.toArray()[i].toString(), caisse);
-        	caisses.add(caisse);
-        }
-        Observateur obs = new Observateur(file);
+        Observateur obs = new Observateur(Autoroute.vuepeage.getFile());
         
         //Lancer le timer
         Timer t = new Timer(true); //timer deamon
@@ -85,11 +62,8 @@ public class Autoroute {
             voitures.add(v);
             v.start();
         }
-        
+                
         System.out.print("Fin Main");
-        fenetre.setSize(new Dimension(600, 400));
-        //fenetre.pack();
-        fenetre.setVisible(true);
 
     }
 
@@ -101,10 +75,11 @@ public class Autoroute {
 		Autoroute.array_caisses = array_caisses;
 	}
 
-	public static void increment_attente_total(long attente_total) {
+	public static void maj_attente_moy(long attente_total) {
 		Autoroute.attente_total += attente_total;
 		//System.out.println("Temps d'attente total :" + (float)Autoroute.attente_total);
-		Autoroute.label_attente.setText("Temps d'attente moyen : " + (float)Autoroute.attente_total/(float)Autoroute.getNb_voitures() + "ms");
+		Autoroute.label_attente.setText("Temps d'attente moyen : " + Math.round(Autoroute.attente_total/Autoroute.getNb_voitures()) + "ms");
+		Autoroute.vuepeage.setAttente(Autoroute.label_attente);
 	}
 
 	public static int getNb_voitures() {
