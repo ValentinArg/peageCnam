@@ -33,14 +33,15 @@ public class Autoroute {
 
     public static void main(String[] args) {
         Autoroute auto = Autoroute.getInstance();
-        auto.simuler();
+        new VueSaisie(auto);
+        //auto.simuler();
     }
 
-    public void simuler() {
-        VueSaisie vue1 = new VueSaisie();
-        FormAutoroute f = vue1.lire();
-                
-        Gare gare = new Gare(f.getNb_caisses());
+    public void simuler(int nb_voitures, int nb_caisses, int kmmin, int kmmax, int vitesse) {
+        //VueSaisie vue1 = new VueSaisie();
+        //FormAutoroute f = vue1.lire();
+    	            
+        Gare gare = new Gare(nb_caisses);
         
         //CrÈation de la fenÍtre
         Autoroute.vuepeage = new VuePeage(gare, Autoroute.label_attente);     
@@ -52,13 +53,13 @@ public class Autoroute {
         Timer t = new Timer(true); //timer deamon
         t.schedule(obs, 1000, 1000);
         // Cr√©er le controleur qui terminera le timer
-        Controleur controleur = new Controleur(f.getNb_voitures(), t);
+        Controleur controleur = new Controleur(nb_voitures, t);
         controleur.start();
         
         //cr√©ation de la barri√®re de d√©part
-        CountDownLatch barriere = new CountDownLatch(f.getNb_voitures()); //Attends la crÈation de toutes les voitures
-        for (int i = 0; i < f.getNb_voitures(); i++) {
-            Voiture v = new Voiture(i, f.getVitesse(), gare, obs, f.getKm_min(), f.getKm_max(), barriere, controleur);
+        CountDownLatch barriere = new CountDownLatch(nb_voitures); //Attends la crÈation de toutes les voitures
+        for (int i = 0; i < nb_voitures; i++) {
+            Voiture v = new Voiture(i, vitesse, gare, obs, kmmin, kmmax, barriere, controleur);
             voitures.add(v);
             v.start();
         }
