@@ -18,7 +18,7 @@ public class VueSaisie {
 		Container contenu = fenetre.getContentPane();
         contenu.setLayout(new BorderLayout());
         
-        JPanel champs = new JPanel(new GridLayout(5,2));
+        JPanel champs = new JPanel(new GridLayout(6,2));
         contenu.add(champs, BorderLayout.CENTER);
         
         JLabel label_nbvoitures = new JLabel("Nombre de voitures :");
@@ -46,6 +46,10 @@ public class VueSaisie {
         JTextField field_vitesse = new JTextField(10);
         champs.add(field_vitesse);
         
+        JLabel erreur = new JLabel("");
+		erreur.setForeground(Color.RED);
+		champs.add(erreur);
+        
         JPanel boutons = new JPanel(new FlowLayout());
         contenu.add(boutons, BorderLayout.SOUTH);
         
@@ -55,15 +59,24 @@ public class VueSaisie {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				try {
 				
-				int nb_voitures = Integer.parseInt(field_nbvoitures.getText());
-				int nb_caisses = Integer.parseInt(field_nbcaisses.getText());
-				int kmmin = Integer.parseInt(field_kmmin.getText());
-				int kmmax = Integer.parseInt(field_kmmax.getText());
-				int vitesse = Integer.parseInt(field_vitesse.getText());
-				
-				auto.simuler(nb_voitures, nb_caisses, kmmin, kmmax, vitesse);
-				fenetre.dispose();
+					int nb_voitures = Integer.parseInt(field_nbvoitures.getText());
+					int nb_caisses = Integer.parseInt(field_nbcaisses.getText());
+					int kmmin = Integer.parseInt(field_kmmin.getText());
+					int kmmax = Integer.parseInt(field_kmmax.getText());
+					int vitesse = Integer.parseInt(field_vitesse.getText());
+					
+					auto.simuler(nb_voitures, nb_caisses, kmmin, kmmax, vitesse);
+					fenetre.dispose();
+				}catch(NumberFormatException ex) {
+					field_nbvoitures.setText("");
+					field_nbcaisses.setText("");
+					field_kmmin.setText("");
+					field_kmmax.setText("");
+					field_vitesse.setText("");
+					erreur.setText("Vous ne pouvez saisir que des entiers !");
+				}
 			}
         	
         });
